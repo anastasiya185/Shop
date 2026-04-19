@@ -1,24 +1,38 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-export default function Product(props) {
-    const [openCompound, setOpenCompound] = useState(false)
-    const toggleOpen = () => {
-        setOpenCompound(!openCompound)
-    }
+export default function Product({ product, addToBasket }) {
+  const [openCompound, setOpenCompound] = useState(false);
 
-    const addToBasket = () => {
-        props.addToBasket({ name: props.name, price: props.price });
-    };
+  const toggleOpen = () => {
+    setOpenCompound((prev) => !prev);
+  };
 
+  return (
+    <article className="product">
+      <div className="productHeader">
+        <span className="courseTag">{product.level}</span>
+        <span className="courseDuration">{product.duration}</span>
+      </div>
 
-    return (
-        <div className='product'>
-            <h3>{props.name}</h3>
-            <p>Price:{props.price}</p>
-            <button className='openButton' onClick={toggleOpen}>for information</button>
-            <button className='plusButton' onClick={addToBasket}>+</button>
-            {openCompound && <div>{props.compound}</div>}
+      <h3>{product.name}</h3>
 
+      <p className="productPrice">
+        {product.price.toLocaleString()} NIS
+      </p>
+
+      <button className="openButton" onClick={toggleOpen}>
+        {openCompound ? 'Hide details' : 'Course details'}
+      </button>
+
+      {openCompound && (
+        <div className="compoundBox">
+          <p>{product.compound}</p>
         </div>
-    )
+      )}
+
+      <button className="plusButton" onClick={() => addToBasket(product)}>
+        Add to Cart
+      </button>
+    </article>
+  );
 }

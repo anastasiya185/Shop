@@ -1,99 +1,151 @@
-
 import { useState } from 'react';
 import './App.css';
+
 import ProductList from './components/ProductList';
 import BasketList from './components/BasketList';
-import basket from './components/basket.svg'
-import house from './components/house.svg'
-
+import basket from './components/basket.svg';
+import house from './components/house.svg';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [myProduct, setMyProduct] = useState([
-    {name:"FullStack", price: "20000 NIS", compound: "NodeJS, MongoDB, React, JS"},
-    {name:"Backend", price: "18000 NIS", compound: "JAVA"},
-    {name:"Frontend", price: "16000 NIS", compound: "HTML, CSS, JS"},
-    {name: "Java-Developer", price: "25000 NIS", compound: "JAVA, REST Controller, MongoDB, "},
-    {name: "QA", price:"22000 NIS", compound: "DATA Base, SQL, writing test scripts"}
-  ])
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [showBasket, setShowBasket] = useState(false);
 
-  const ProductsPerPage = 3;
+  const products = [
+    {
+      id: 1,
+      name: 'Full Stack Development',
+      price: 20000,
+      compound: 'Node.js, MongoDB, React, JavaScript',
+      level: 'Advanced',
+      duration: '8 months',
+    },
+    {
+      id: 2,
+      name: 'Backend Development',
+      price: 18000,
+      compound: 'Java, REST API, Spring Basics',
+      level: 'Intermediate',
+      duration: '6 months',
+    },
+    {
+      id: 3,
+      name: 'Frontend Development',
+      price: 16000,
+      compound: 'HTML, CSS, JavaScript, React',
+      level: 'Beginner friendly',
+      duration: '5 months',
+    },
+    {
+      id: 4,
+      name: 'Java Developer',
+      price: 25000,
+      compound: 'Java, REST Controllers, MongoDB',
+      level: 'Advanced',
+      duration: '9 months',
+    },
+    {
+      id: 5,
+      name: 'QA Automation',
+      price: 22000,
+      compound: 'Databases, SQL, test scripts, automation basics',
+      level: 'Intermediate',
+      duration: '6 months',
+    },
+  ];
 
-  const totalPages = Math.ceil(myProduct.length / ProductsPerPage);
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  const productsPerPage = 3;
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
-  const visibleProducts = myProduct.slice(
-      (currentPage - 1) * ProductsPerPage,
-      currentPage * ProductsPerPage
+  const visibleProducts = products.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
   );
 
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const addToBasket = (product) => {
-    setSelectedProducts([...selectedProducts, product]);
+    setSelectedProducts((prevProducts) => [...prevProducts, product]);
   };
 
-  const [showBasket, setShowBasket] = useState(false)
-  const [showProductList, setShowProductList] = useState(true)
+  const deleteProduct = (indexToDelete) => {
+    setSelectedProducts((prevProducts) =>
+      prevProducts.filter((_, index) => index !== indexToDelete)
+    );
+  };
+
   const showBasketProducts = () => {
     setShowBasket(true);
-    setShowProductList(false);
   };
 
   const showProductListMenu = () => {
     setShowBasket(false);
-    setShowProductList(true);
   };
 
-
-
-  const deleteProduct = (i)=>{
-    const newArr = selectedProducts.filter((_, index)=> index!==i)
-    setSelectedProducts(newArr)
-  }
-
   return (
-      <div className="App">
+    <div className="App">
+      <div className="shopPage">
+        <nav className="nav-main">
+          <button className="iconButton" onClick={showProductListMenu}>
+            <img src={house} className="navIcon" alt="home" />
+          </button>
 
-        <div className="container_main">
-          <div className='nav-main'>
-            <button className="house-button" onClick={showProductListMenu}>
-              <img src={house} className='house-logo' alt='house' />
-            </button>
-            <h1>SV-SHOP</h1>
-            <button className="basket-button" onClick={showBasketProducts}>
-              <img src={basket} className="basket-logo" alt="basket" />
-            </button>
+          <div className="brandBox">
+            <span className="brandBadge">SV</span>
+            <div>
+              <h1>SV-SHOP</h1>
+              <p>Online tech courses</p>
+            </div>
           </div>
 
-          <div className="container">
-            {showBasket ? (<BasketList
-                  selectedProducts={selectedProducts}
-                  deleteProduct={deleteProduct}
+          <button className="iconButton basketIconButton" onClick={showBasketProducts}>
+            <img src={basket} className="navIcon" alt="basket" />
+            {selectedProducts.length > 0 && (
+              <span className="basketBadge">{selectedProducts.length}</span>
+            )}
+          </button>
+        </nav>
+
+        <main className="shopLayout">
+          <section className="heroSection">
+            <p className="smallLabel">Career Courses</p>
+            <h2>Choose your next tech path</h2>
+            <p>
+              Browse development and QA courses, explore course details, and add your favorite programs to the cart.
+            </p>
+          </section>
+
+          <section className="contentCard">
+            {showBasket ? (
+              <BasketList
+                selectedProducts={selectedProducts}
+                deleteProduct={deleteProduct}
+                goToProducts={showProductListMenu}
               />
-          ) : (
-              <ProductList
-                  myProduct={visibleProducts}
-                  addToBasket={addToBasket} />
-          )}
-            {totalPages > 1 && (
-                <div className="pagination">
-                  {Array.from({ length: totalPages }).map((_, index) => (
+            ) : (
+              <>
+                <ProductList
+                  products={visibleProducts}
+                  addToBasket={addToBasket}
+                />
+
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    {Array.from({ length: totalPages }).map((_, index) => (
                       <button
-                          key={index}
-                          onClick={() => handlePageChange(index + 1)}
-                          className={currentPage === index + 1 ? 'active' : ''}
+                        key={index}
+                        onClick={() => setCurrentPage(index + 1)}
+                        className={currentPage === index + 1 ? 'active' : ''}
                       >
                         {index + 1}
                       </button>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
-          </div>
-
-        </div>
+          </section>
+        </main>
       </div>
+    </div>
   );
 }
 
